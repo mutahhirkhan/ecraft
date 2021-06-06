@@ -1,15 +1,13 @@
-const express = require("express")
+require('dotenv').config()
+const app = require('./app')
 const mongoose = require('mongoose');
-const mongoDB_password = "vLOGDlXoYoZ6PsVW"
-mongoose.connect('mongodb+srv://Mutahhir:vLOGDlXoYoZ6PsVW@cluster0.slryu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true}).then((con) => {
+
+const DB = process.env.MONGO_STRING.replace("<PASSWORD>", process.env.MONGO_PASSWORD)
+mongoose.connect(DB, {useNewUrlParser: true, useUnifiedTopology: true}).then((con) => {
     console.log('connected')
-    console.log(con.connections)
 });
 
-const app = express()
 
-
-
-app.listen(8000, () => {
-    console.log('server running on port 8000')
+app.listen(process.env.PORT, () => {
+    console.log(`server running on port ${process.env.PORT}`)
 })
