@@ -11,12 +11,26 @@ ttile : {
 }
 */
 const artSchema = new mongoose.Schema({
-    title: String,
-    rating: Number,
-    cost: Number,
-
-
-})
+    title: String,              //my first art
+    description: String,        //my short desc
+    cost: Number,               //$58
+    resolution: String,         //1920x1080
+    likes: Number,              //23
+    reviews: [
+        {
+            content: String,    //cool
+            reviewedBy: String, //abc123
+            rating: Number,      //4
+        },
+    ],
+    gallery: Array,             //["abc.com", "xyz.com"]
+    orientation: String,        //landscape/portrait
+    subject: String,            //drop shot
+    formats: Array,             //["jpg", "jpeg", "ai"]
+}, {
+    timestamps: true
+}
+)
 
 //ye collection bana he
 const Art = new mongoose.model('Art', artSchema)

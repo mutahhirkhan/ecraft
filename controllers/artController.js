@@ -16,3 +16,23 @@ exports.addArt = async (req, res) => {
         res.status(404).json({error: error.message})
     }
 }
+
+
+exports.getArts = async (req, res) => {
+    try {
+        console.log(req.query)
+        var arts = await Art.find(req.query)
+        // console.log(arts)
+        res.status(200).json({
+            results: arts.length,
+            status: "succes",
+            data: {
+                arts
+            }
+
+        })  
+    } catch (error) {
+        console.log(error)
+       res.status(404).json({error: error.message})
+    }
+}
