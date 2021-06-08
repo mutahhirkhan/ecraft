@@ -25,13 +25,19 @@ exports.getArts = async (req, res) => {
         // console.log(arts)
         
         //regex for query modification
-        var{role, moreData, ...restQueries} = req.query
+        //1 - filtering
+        var{role, moreData, sort, ...restQueries} = req.query
         var queryStr = JSON.stringify(restQueries)
         var modifiedStr = queryStr.replace(/\b(gt|lt|gte|lte|in)\b/g, match => `$${match}`)
         var query = JSON.parse(modifiedStr)
         
+        var arts = Art.find(query)
+        //2 - sorting
+        if(sort) arts.sort(sort)
+        else arts.sort("-createdAt")
+
         //pass the modelled query
-        var arts = await Art.find(query)
+        arts = await arts
         console.log(arts)
         res.status(200).json({
             results: arts.length,
