@@ -25,22 +25,45 @@ exports.getArts = async (req, res) => {
         // console.log(arts)
         
         //regex for query modification
+        
         //1 - filtering
-        var{role, moreData, sort, ...restQueries} = req.query
+        var{role, sort, fields, page, limit, ...restQueries} = req.query
         var queryStr = JSON.stringify(restQueries)
         var modifiedStr = queryStr.replace(/\b(gt|lt|gte|lte|in)\b/g, match => `$${match}`)
-        var query = JSON.parse(modifiedStr)
+        var queryObj = JSON.parse(modifiedStr)
         
-        var arts = Art.find(query)
+        var query = Art.find(queryObj)  //promise
+        
         //2 - sorting
-        if(sort) arts.sort(sort)
-        else arts.sort("-createdAt")
+        if(sort) {
+            sort = sort.split(",").join(" ")    //chain promise
+            console.log("sort"+sort)
+            query = query.sort(sort)
+        }
+        else query.sort("-createdAt")
+        
+        //3 - fields limiting
+        if(fields) {
+            fields = fields.split(",").join(" ")    //chain promise
+            query = query.select(fields)
+        }
+        else query = query.select("-__v")
+        
+        //4 - paginations
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 2
+        var skip = (page - 1) * limit
+        console.log("skip"+skip)
+        query = query.skip(skip).limit(limit)       //chain promise
 
         //pass the modelled query
-        arts = await arts
-        console.log(arts)
+        var arts = await query   //promise resolved
+
+        //total pages count
+        var totalPages = Math.ceil(await Art.countDocuments() / limit) 
         res.status(200).json({
             results: arts.length,
+            pages: totalPages,
             status: "succes",
             data: {
                 arts
