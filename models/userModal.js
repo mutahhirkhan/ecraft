@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs")
+
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -30,6 +32,12 @@ const userSchema = new mongoose.Schema({
     ],
   },
 });
+
+//model instance method
+//this method will be available to all documents, created by this model
+userSchema.methods.passwordVerification = async (password, hashPassword) => (
+  await bcrypt.compare(password, hashPassword) // compare("pass123pass123", "$s32gdnfdnf")
+)
 
 // "save" shows that it's a document middleware
 // called on .create and .save

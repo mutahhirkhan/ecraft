@@ -61,7 +61,7 @@ exports.login = async (req, res) => {
     var user = await User.findOne({email}).select("+password") // urged to fetch password field must
     //varify password
     //encrypted pw === password 
-    var verifiedPassword = await bcrypt.compare(password, user.password) // compare("pass123pass123", "$s32gdnfdnf")
+    var verifiedPassword = await user.passwordVerification(password, user.password) // compare("pass123pass123", "$s32gdnfdnf")
       if(!verifiedPassword || !user)
       return res.status(401).json({         //401 --> unauthorized 
         error: "invalid email or password", //tell that both things has to verify, for security purpose
