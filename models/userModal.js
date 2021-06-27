@@ -40,6 +40,8 @@ userSchema.pre("save", async function (next) {
     if(!this.isModified("password")) return next()
     var encryptedPassword  = await bcrypt.hash(this.password, 12) //number brute force attack strength. this number is weightage of encryption
     this.password = encryptedPassword;
+    
+    //TO CHECK 
     this.confirmPassword = undefined    // to remove field from field bcz this is only for validation
     next();
 });
