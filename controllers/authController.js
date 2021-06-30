@@ -1,6 +1,7 @@
 const User = require("../models/userModal");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcryptjs")
+const {promisify} = require("util")
 
 
 var signJWT = (userId) => {
@@ -85,3 +86,28 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+//middleware
+exports.protected = async (req, res, next) => {
+  try {
+    var token = null;
+    //fetch token from request header
+    if(req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+      token = req.headers.authorization.split(" ")[1]
+    }
+    //check if token exists
+    if(!token) return res.status(404).json({ error: "please sign in" });
+
+    //verify token
+    var {id: userId} =  await promisify(JWT.verify)(token, process.env.JWT_WEB_SECRET)
+    var user = await User.findById(userId)
+    
+    //check id user exists in DB
+    if(!user)    return res.status(404).json({ error: "user regarding this token does not exists" });
+    console.log(user)
+    next()
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
+  }
+}
