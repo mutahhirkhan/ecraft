@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "username is required"], //overriding the 2nd arg which is for error message
   },
+  role: {
+    type: String,
+    required: [true, "role is required!"],
+    enum: ["artist", "buyer"]
+  },
   email: {
     type: String,
     unique: true,
@@ -31,6 +36,7 @@ const userSchema = new mongoose.Schema({
       "password does not match",
     ],
   },
+  passwordChangedAt: Date
 });
 
 //model instance method

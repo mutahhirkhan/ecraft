@@ -1,11 +1,11 @@
-const express = require("express")
-const { addArt, getArts } = require("../controllers/artController")
-const { protected } = require("../controllers/authController")
+const express = require("express");
+const { addArt, getArts } = require("../controllers/artController");
+const { protected, restrictTo } = require("../controllers/authController");
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/', addArt)
-router.get('/', protected, getArts)
+router.post("/",  protected, restrictTo("buyer"), addArt); // only for artist and admin
+router.get("/", getArts); 
 
 
-module.exports = router
+module.exports = router;
