@@ -18,6 +18,77 @@ exports.addArt = async (req, res) => {
   }
 };
 
+exports.getOneArt = async (req, res) => {
+  try {
+    var {id} = req.query
+    var query = await Art.findById(id)
+   
+    res.status(200).json({
+      status: "one art fetched successfully ",
+      data:{
+        art: query
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
+  }
+}
+
+exports.deleteOneArt = async (req, res) => {
+  try {
+    var {id} = req.query
+    // console.log(req.query)
+    var query = await Art.remove({_id: id})
+    if(!query.deletedCount) {
+      return res.status(404).json(
+        {  
+          status: "success",
+          data:{
+            art:"art doesn't exists"
+          }
+        });      
+    }
+    res.status(200).json({
+      status: "one art deleted successfully ",
+      data:{
+        art: query
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
+  }
+}
+
+exports.updateOne = async (req, res) => {
+  try {
+    console.log(req.body)
+    var {id} = req.query
+    var art = await Art.findById(id)
+    console.log(art)
+    if(!art) {
+      res.status(200).json({
+        status: "successful",
+        data:{
+          art:"art not found",
+        }
+      });
+    }
+    var query = await Art.findOneAndUpdate({_id: id}, req.body, {upsert: true})
+    console.log(query)
+    res.status(200).json({
+      status: "one art updated successfully ",
+      data:{
+        art,
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
+  }
+}
+
 exports.getArts = async (req, res) => {
   try {
     var { limit = 2 } = req.query;
