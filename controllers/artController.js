@@ -68,8 +68,8 @@ exports.updateOne = async (req, res) => {
     var art = await Art.findById(id)
     console.log(art)
     if(!art) {
-      res.status(200).json({
-        status: "successful",
+      res.status(404).json({
+        status: "error",
         data:{
           art:"art not found",
         }

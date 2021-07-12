@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs")
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto")
 
 
 const userSchema = new mongoose.Schema({
@@ -36,7 +37,9 @@ const userSchema = new mongoose.Schema({
       "password does not match",
     ],
   },
-  passwordChangedAt: Date
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetTokenExpiresAt: Date,
 });
 
 //model instance method
@@ -44,6 +47,28 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.passwordVerification = async (password, hashPassword) => (
   await bcrypt.compare(password, hashPassword) // compare("pass123pass123", "$s32gdnfdnf")
 )
+
+//password reset token generator
+userSchema.methods.passwordResetTokenGenerator = function () {  //this
+  //generate random 32bits string
+  var resetToken = crypto.randomBytes(32).toString('hex')
+  //encrypt reset token
+  var encryptedResetToken = crypto.createHash("sha256").update(resetToken).digest("hex")
+  //save encrypted token  in user document
+  this.passwordResetToken = encryptedResetToken
+  //set token expiry of 10 mins
+  this.passwordResetTokenExpiresAt = Date.now() + 10 * 60 * 1000  //curren time + 10 mints
+  //return non encrypted reset token
+  return resetToken;  //non encrypted
+
+}
+
+//used in password changed
+userSchema.pre("save", async function(next) {
+  if(!this.isModified("password") && !this.isNew) return next()
+  this.passwordChangedAt = Date.now() - 1000;   //in case, if JWT not signed before field saving
+  next()
+})
 
 // "save" shows that it's a document middleware
 // called on .create and .save
