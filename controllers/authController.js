@@ -14,7 +14,16 @@ var signJWT = (userId) => {
 const createAndSendToken =(user, res) => {
   var token = signJWT(user._id)
   var { password, ...modifiedUser } = user.toObject(); // converted to simple object
-
+  res.cookie("jwt", token, {
+    expires :new Date(Date.now() + parseInt(process.env.COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000), //expiresIn
+    secure: process.env.NODE_ENV === 'development' ? false : true,
+    httpOnly: true  //transfer only in http/https
+    
+    //maxAge
+    //expires
+    //signed
+    //path
+  })
   res.status(200).json({
     token,
     status:"success",
@@ -229,3 +238,14 @@ exports.resetPassword = async (req, res) => {
     res.status(404).json({ error: error.message });
   }
 };
+
+exports.updatePassword = (req, res, next) => {
+  try {
+    var{currentPassword, newPassword, confirmPassword} = req.body
+
+    
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
+  }
+}
